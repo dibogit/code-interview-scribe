@@ -40,17 +40,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   // Initialize speech recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
+      const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognitionAPI();
       
       if (recognitionRef.current) {
         recognitionRef.current.continuous = true;
         recognitionRef.current.interimResults = true;
         recognitionRef.current.lang = 'en-US';
 
-        recognitionRef.current.onresult = (event) => {
+        recognitionRef.current.onresult = (event: any) => {
           const transcript = Array.from(event.results)
-            .map(result => result[0].transcript)
+            .map((result: any) => result[0].transcript)
             .join('');
           
           setInputMessage(transcript);
@@ -60,7 +60,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           setIsListening(false);
         };
 
-        recognitionRef.current.onerror = (event) => {
+        recognitionRef.current.onerror = (event: any) => {
           console.error('Speech recognition error:', event.error);
           setIsListening(false);
           toast.error('Speech recognition error. Please try again.');
