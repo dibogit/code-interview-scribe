@@ -1,9 +1,8 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Send, Volume2 } from 'lucide-react';
+import { Send, Volume2, Mic, MicOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Message {
@@ -33,8 +32,64 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 }) => {
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [questionCount, setQuestionCount] = useState(1);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      
+      if (recognitionRef.current) {
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+        recognitionRef.current.lang = 'en-US';
+
+        recognitionRef.current.onresult = (event) => {
+          const transcript = Array.from(event.results)
+            .map(result => result[0].transcript)
+            .join('');
+          
+          setInputMessage(transcript);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onerror = (event) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+          toast.error('Speech recognition error. Please try again.');
+        };
+      }
+    }
+
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, []);
+
+  const startListening = () => {
+    if (recognitionRef.current && !isListening) {
+      setInputMessage('');
+      recognitionRef.current.start();
+      setIsListening(true);
+      toast.success('Listening... Speak now');
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -136,6 +191,11 @@ For coding questions, format them clearly and mention it's a coding challenge.`;
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
 
+    // Stop listening when sending message
+    if (isListening) {
+      stopListening();
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       text: inputMessage,
@@ -215,15 +275,30 @@ For coding questions, format them clearly and mention it's a coding challenge.`;
 
       {/* Input */}
       <div className="p-4 border-t border-gray-600">
+        {isListening && (
+          <div className="mb-2 p-2 bg-red-600 rounded text-white text-center text-sm">
+            🎤 Listening... Speak now
+          </div>
+        )}
+        
         <div className="flex space-x-2">
           <Input
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Type your answer..."
+            placeholder="Type your answer or click mic to speak..."
             className="flex-1 bg-gray-700 border-gray-600 text-white placeholder-gray-400"
             disabled={isLoading}
           />
+          
+          <Button
+            onClick={isListening ? stopListening : startListening}
+            disabled={isLoading}
+            className={`${isListening ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700'}`}
+          >
+            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+          </Button>
+          
           <Button
             onClick={handleSendMessage}
             disabled={!inputMessage.trim() || isLoading}
