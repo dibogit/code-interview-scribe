@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Bot, User } from 'lucide-react';
@@ -15,6 +15,46 @@ const VideoCallInterface: React.FC<VideoCallInterfaceProps> = ({
   isMuted, 
   currentQuestion 
 }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [stream, setStream] = useState<MediaStream | null>(null);
+  const [cameraError, setCameraError] = useState<string>('');
+
+  useEffect(() => {
+    const startCamera = async () => {
+      if (!isVideoOff) {
+        try {
+          const mediaStream = await navigator.mediaDevices.getUserMedia({ 
+            video: true, 
+            audio: false 
+          });
+          setStream(mediaStream);
+          if (videoRef.current) {
+            videoRef.current.srcObject = mediaStream;
+          }
+          setCameraError('');
+        } catch (error) {
+          console.error('Error accessing camera:', error);
+          setCameraError('Camera access denied or not available');
+        }
+      } else {
+        // Stop camera when video is off
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+          setStream(null);
+        }
+      }
+    };
+
+    startCamera();
+
+    // Cleanup function
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [isVideoOff]);
+
   return (
     <div className="h-full flex flex-col space-y-4">
       {/* AI Interviewer Video */}
@@ -59,15 +99,27 @@ const VideoCallInterface: React.FC<VideoCallInterfaceProps> = ({
             </div>
           </div>
         ) : (
-          <div className="h-full bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center">
-            <div className="text-center">
-              <Avatar className="w-16 h-16 mx-auto mb-2">
-                <AvatarFallback className="bg-blue-600 text-white">
-                  <User className="w-8 h-8" />
-                </AvatarFallback>
-              </Avatar>
-              <p className="text-white text-sm">You</p>
-            </div>
+          <div className="h-full relative">
+            {cameraError ? (
+              <div className="h-full flex items-center justify-center bg-red-900/20">
+                <div className="text-center">
+                  <Avatar className="w-16 h-16 mx-auto mb-2">
+                    <AvatarFallback className="bg-red-600 text-white">
+                      <User className="w-8 h-8" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <p className="text-red-400 text-xs px-2">{cameraError}</p>
+                </div>
+              </div>
+            ) : (
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="w-full h-full object-cover"
+              />
+            )}
           </div>
         )}
 

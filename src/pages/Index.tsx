@@ -7,7 +7,7 @@ import DomainSelector from '@/components/DomainSelector';
 import ChatInterface from '@/components/ChatInterface';
 import CodeEditor from '@/components/CodeEditor';
 import InterviewScorecard from '@/components/InterviewScorecard';
-import { Mic, MicOff, Video, VideoOff, Users, Settings } from 'lucide-react';
+import { Mic, MicOff, Video, VideoOff, Users, Settings, Code } from 'lucide-react';
 
 const Index = () => {
   const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
@@ -45,6 +45,10 @@ const Index = () => {
     setMessages([]);
     setCurrentQuestion('');
     setShowCodeEditor(false);
+  };
+
+  const toggleCodeEditor = () => {
+    setShowCodeEditor(!showCodeEditor);
   };
 
   if (showScorecard) {
@@ -128,6 +132,15 @@ const Index = () => {
             >
               {isVideoOff ? <VideoOff className="w-4 h-4" /> : <Video className="w-4 h-4" />}
             </Button>
+
+            <Button
+              variant={showCodeEditor ? "default" : "outline"}
+              size="sm"
+              onClick={toggleCodeEditor}
+              className="p-2"
+            >
+              <Code className="w-4 h-4" />
+            </Button>
             
             <Button variant="outline" size="sm" className="p-2">
               <Settings className="w-4 h-4" />
@@ -145,9 +158,9 @@ const Index = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex h-[calc(100vh-80px)]">
+      <div className="flex h-[calc(100vh-80px)] flex-col lg:flex-row">
         {/* Left Side - Video */}
-        <div className="flex-1 p-4">
+        <div className={`${showCodeEditor ? 'lg:flex-1' : 'flex-1'} p-4 min-h-[50vh] lg:min-h-full`}>
           <VideoCallInterface 
             isVideoOff={isVideoOff} 
             isMuted={isMuted}
@@ -156,7 +169,7 @@ const Index = () => {
         </div>
 
         {/* Right Side - Chat and Code Editor */}
-        <div className="w-96 border-l border-gray-700 flex flex-col">
+        <div className={`${showCodeEditor ? 'lg:w-1/2' : 'lg:w-96'} border-l border-gray-700 flex flex-col transition-all duration-300`}>
           {showCodeEditor && (
             <div className="h-1/2 border-b border-gray-700">
               <CodeEditor />

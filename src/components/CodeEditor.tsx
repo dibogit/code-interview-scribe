@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Play, Copy, RotateCcw } from 'lucide-react';
+import { Play, Copy, RotateCcw, X } from 'lucide-react';
 import { toast } from 'sonner';
 
 const CodeEditor: React.FC = () => {
@@ -42,17 +42,17 @@ const CodeEditor: React.FC = () => {
   return (
     <Card className="h-full bg-gray-800 border-gray-600 flex flex-col">
       {/* Header */}
-      <div className="p-4 border-b border-gray-600">
+      <div className="p-3 border-b border-gray-600">
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold text-white">Code Editor</h3>
+          <h3 className="font-semibold text-white text-sm">Code Editor</h3>
           <div className="flex items-center space-x-2">
             <Select value={language} onValueChange={setLanguage}>
-              <SelectTrigger className="w-32 bg-gray-700 border-gray-600 text-white">
+              <SelectTrigger className="w-28 h-8 bg-gray-700 border-gray-600 text-white text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-gray-700 border-gray-600">
                 {languages.map((lang) => (
-                  <SelectItem key={lang.value} value={lang.value} className="text-white">
+                  <SelectItem key={lang.value} value={lang.value} className="text-white text-xs">
                     {lang.label}
                   </SelectItem>
                 ))}
@@ -61,16 +61,16 @@ const CodeEditor: React.FC = () => {
           </div>
         </div>
         
-        <div className="flex space-x-2">
-          <Button onClick={handleRunCode} size="sm" className="bg-green-600 hover:bg-green-700">
+        <div className="flex space-x-1">
+          <Button onClick={handleRunCode} size="sm" className="bg-green-600 hover:bg-green-700 h-7 px-2 text-xs">
             <Play className="w-3 h-3 mr-1" />
             Run
           </Button>
-          <Button onClick={handleCopyCode} size="sm" variant="outline" className="border-gray-600 text-gray-300">
+          <Button onClick={handleCopyCode} size="sm" variant="outline" className="border-gray-600 text-gray-300 h-7 px-2 text-xs">
             <Copy className="w-3 h-3 mr-1" />
             Copy
           </Button>
-          <Button onClick={handleReset} size="sm" variant="outline" className="border-gray-600 text-gray-300">
+          <Button onClick={handleReset} size="sm" variant="outline" className="border-gray-600 text-gray-300 h-7 px-2 text-xs">
             <RotateCcw className="w-3 h-3 mr-1" />
             Reset
           </Button>
@@ -78,19 +78,19 @@ const CodeEditor: React.FC = () => {
       </div>
 
       {/* Code Editor */}
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-3 min-h-0">
         <Textarea
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className="h-32 font-mono text-sm bg-gray-900 border-gray-600 text-green-400 resize-none"
+          className="h-full font-mono text-xs bg-gray-900 border-gray-600 text-green-400 resize-none"
           placeholder="Write your code here..."
         />
       </div>
 
       {/* Output */}
-      <div className="p-4 border-t border-gray-600">
-        <h4 className="text-sm font-medium text-white mb-2">Output:</h4>
-        <div className="bg-gray-900 border border-gray-600 rounded p-2 text-sm font-mono text-gray-300 min-h-[60px]">
+      <div className="p-3 border-t border-gray-600 max-h-24 min-h-[80px]">
+        <h4 className="text-xs font-medium text-white mb-1">Output:</h4>
+        <div className="bg-gray-900 border border-gray-600 rounded p-2 text-xs font-mono text-gray-300 h-12 overflow-y-auto">
           {output || 'No output yet. Run your code to see results.'}
         </div>
       </div>
