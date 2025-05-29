@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Play, Copy, RotateCcw, X } from 'lucide-react';
 import { toast } from 'sonner';
 
-const CodeEditor: React.FC = () => {
+const CodeEditor = () => {
   const [code, setCode] = useState('// Write your solution here\nfunction solution() {\n    \n}');
   const [language, setLanguage] = useState('javascript');
   const [output, setOutput] = useState('');

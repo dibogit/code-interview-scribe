@@ -10,16 +10,16 @@ import InterviewScorecard from '@/components/InterviewScorecard';
 import { Mic, MicOff, Video, VideoOff, Users, Settings, Code } from 'lucide-react';
 
 const Index = () => {
-  const [selectedDomain, setSelectedDomain] = useState<string | null>(null);
+  const [selectedDomain, setSelectedDomain] = useState(null);
   const [interviewStarted, setInterviewStarted] = useState(false);
   const [showScorecard, setShowScorecard] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState<string>('');
+  const [currentQuestion, setCurrentQuestion] = useState('');
   const [showCodeEditor, setShowCodeEditor] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoOff, setIsVideoOff] = useState(false);
-  const [messages, setMessages] = useState<Array<{id: string, text: string, sender: 'ai' | 'user', timestamp: Date}>>([]);
+  const [messages, setMessages] = useState([]);
 
-  const handleDomainSelect = (domain: string) => {
+  const handleDomainSelect = (domain) => {
     setSelectedDomain(domain);
     setInterviewStarted(true);
     
@@ -27,7 +27,7 @@ const Index = () => {
     const welcomeMessage = {
       id: Date.now().toString(),
       text: `Welcome to your ${domain} interview! I'm your AI interviewer. Let's start with some questions to understand your background. Are you ready to begin?`,
-      sender: 'ai' as const,
+      sender: 'ai',
       timestamp: new Date()
     };
     setMessages([welcomeMessage]);

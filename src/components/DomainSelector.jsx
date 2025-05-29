@@ -4,11 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Code, Briefcase, Calculator, Palette, Users, Brain } from 'lucide-react';
 
-interface DomainSelectorProps {
-  onDomainSelect: (domain: string) => void;
-}
-
-const DomainSelector: React.FC<DomainSelectorProps> = ({ onDomainSelect }) => {
+const DomainSelector = ({ onDomainSelect }) => {
   const domains = [
     {
       name: 'Software Development',

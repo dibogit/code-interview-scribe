@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,25 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Send, Volume2, Mic, MicOff } from 'lucide-react';
 import { toast } from 'sonner';
 
-interface Message {
-  id: string;
-  text: string;
-  sender: 'ai' | 'user';
-  timestamp: Date;
-}
-
-interface ChatInterfaceProps {
-  messages: Message[];
-  setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-  domain: string;
-  onQuestionUpdate: (question: string) => void;
-  onShowCodeEditor: (show: boolean) => void;
-}
-
 const API_KEY = "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";
 const API_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ 
+const ChatInterface = ({ 
   messages, 
   setMessages, 
   domain, 
@@ -33,14 +19,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef(null);
   const [questionCount, setQuestionCount] = useState(1);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef(null);
 
   // Initialize speech recognition
   useEffect(() => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
       recognitionRef.current = new SpeechRecognitionAPI();
       
       if (recognitionRef.current) {
@@ -48,9 +34,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         recognitionRef.current.interimResults = true;
         recognitionRef.current.lang = 'en-US';
 
-        recognitionRef.current.onresult = (event: any) => {
+        recognitionRef.current.onresult = (event) => {
           const transcript = Array.from(event.results)
-            .map((result: any) => result[0].transcript)
+            .map((result) => result[0].transcript)
             .join('');
           
           setInputMessage(transcript);
@@ -60,7 +46,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
           setIsListening(false);
         };
 
-        recognitionRef.current.onerror = (event: any) => {
+        recognitionRef.current.onerror = (event) => {
           console.error('Speech recognition error:', event.error);
           setIsListening(false);
           toast.error('Speech recognition error. Please try again.');
@@ -99,7 +85,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     scrollToBottom();
   }, [messages]);
 
-  const speakText = (text: string) => {
+  const speakText = (text) => {
     if ('speechSynthesis' in window) {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 0.9;
@@ -109,7 +95,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     }
   };
 
-  const generateAIResponse = async (userMessage: string) => {
+  const generateAIResponse = async (userMessage) => {
     setIsLoading(true);
     
     try {
@@ -166,7 +152,7 @@ For coding questions, format them clearly and mention it's a coding challenge.`;
         onShowCodeEditor(true);
       }
 
-      const aiMessage: Message = {
+      const aiMessage = {
         id: Date.now().toString(),
         text: aiResponse,
         sender: 'ai',
@@ -196,7 +182,7 @@ For coding questions, format them clearly and mention it's a coding challenge.`;
       stopListening();
     }
 
-    const userMessage: Message = {
+    const userMessage = {
       id: Date.now().toString(),
       text: inputMessage,
       sender: 'user',
@@ -209,7 +195,7 @@ For coding questions, format them clearly and mention it's a coding challenge.`;
     await generateAIResponse(inputMessage);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();

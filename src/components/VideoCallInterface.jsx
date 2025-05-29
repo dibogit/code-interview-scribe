@@ -4,20 +4,14 @@ import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Bot, User } from 'lucide-react';
 
-interface VideoCallInterfaceProps {
-  isVideoOff: boolean;
-  isMuted: boolean;
-  currentQuestion: string;
-}
-
-const VideoCallInterface: React.FC<VideoCallInterfaceProps> = ({ 
+const VideoCallInterface = ({ 
   isVideoOff, 
   isMuted, 
   currentQuestion 
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const [cameraError, setCameraError] = useState<string>('');
+  const videoRef = useRef(null);
+  const [stream, setStream] = useState(null);
+  const [cameraError, setCameraError] = useState('');
 
   useEffect(() => {
     const startCamera = async () => {
